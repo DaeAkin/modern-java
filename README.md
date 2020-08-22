@@ -1,7 +1,7 @@
 ## Spliterator
 
 - Spliterator는 분할을 어떤식으로 하는거징?
-
+?
 
 
 Spliterator는 jdk8에서 나온 새로운 인터페이스인데, 요소를 순회하며, 분할 합니다. 이름에서도 암시하 듯이, 분할이 가능한 iterator 입니다. iterator와 마찬가지로 Spliterator는 요소를 순회할 수 있지만, stream 안에서만 순회가 가능 합니다.  Spliterator는 순차 stream, parallel 스트림 처리를 위한 몇 개의 중요한 메소드가 있습니다.
