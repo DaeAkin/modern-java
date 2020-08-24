@@ -6,6 +6,7 @@ public class LambdaFeatures {
     public static void main(String[] args) throws Exception {
         int x = 50;
 
+        int finalX = x;
         Thread t = new Thread() {
             public void run() {
                 System.out.println("MyThread start.");
@@ -16,7 +17,7 @@ public class LambdaFeatures {
                     e.printStackTrace();
                 }
 
-                System.out.println("MyThread end. x=" + x);
+                System.out.println("MyThread end. x=" + finalX);
             }
         };
 
