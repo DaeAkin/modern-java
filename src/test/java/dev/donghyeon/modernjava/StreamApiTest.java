@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -75,6 +76,7 @@ public class StreamApiTest {
 
     @Test
     public void reduceThreeArgs_test() {
+        //reduce(초기값, p+str)
         List<String> words = Arrays
                 .asList("This is stream reduction example learn well".split(" "));
 
@@ -94,7 +96,33 @@ public class StreamApiTest {
         Stream.of("grapes", "milk", "pineapple", "water-melon")
                 .sorted(Comparator.comparing(keyExtractor))
                 .forEach(System.out::println);
+
+        Stream.of("grapes", "milk", "pineapple", "water-melon")
+                .sorted(Comparator.comparing(String::length, Comparator.reverseOrder()))
+                .forEach(System.out::println);
     }
+
+    @Test
+    public void comparator_no_boxing_cost_test() {
+        // Natural order sorting by ignoring the sign.
+        Stream.of(-10, 31, 16, -5, 2)
+                .sorted(Comparator.comparingInt(i -> Math.abs(i)))
+                .forEach(System.out::println);
+    }
+
+    @Test
+    public void thenComparing_test() {
+//        List<Employee> employees = Application.getEmployees();
+//        employees.stream()
+//                .sorted(Comparator.comparing(Employee::getSalary).thenComparing(Employee::getName))
+//                .forEach(System.out::println);
+    }
+
+    @Test
+    public void comparing_of_test() {
+
+    }
+
 
 
 
