@@ -3,15 +3,16 @@ package dev.donghyeon.modernjava;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -123,6 +124,115 @@ public class StreamApiTest {
 
     }
 
+    /**
+     * toCollection 이나 toList는 기본으로
+     * HashSet ArrayList를 사용하는데,
+     * 다른 자료구조를 사용하고 싶으면 다음과같이 사용한다.
+     */
+    @Test
+    public void want_another_set_test() {
+        TreeSet<String> set = Stream.of("java", ".net", "python").map(String::toUpperCase)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    @Test
+    public void toCollection_toMap_test() {
+        Map<String, Integer> result = Stream.of("java", ".net", "python")
+                .collect(Collectors.toMap(String::toUpperCase, String::length));
+
+        //Output: {JAVA=4, .NET=4, PYTHON=6}
+    }
+
+    @Test
+    public void toCollection_toMap_duplicatedKey_not_allowed_test() {
+        Stream.of("java", ".net", "python", "jAvA")
+                .collect(Collectors.toMap(String::toUpperCase, String::length, (value1, value2) -> value1))
+                .forEach((k,v) -> System.out.println(k));
+
+        System.out.println("----");
+        
+        Stream.of("java", ".net", "python", "jAvA")
+                .collect(Collectors.toMap(String::toString, String::length, (value1, value2) -> value1))
+                .forEach((k,y) -> System.out.println(k));
+        
+        
+    }
+    
+    @Test
+    public void String_joining_test() {
+        String joiningResult = Stream.of("java", ".net", "python")
+                .collect(joining(", ", "Joined String[ ", " ]"));
+
+        System.out.println(joiningResult);
+
+    }
+
+    @Test
+    public void grouping_test() {
+        List<Trade> trades = Arrays.asList(
+                new Trade("T1001", "John", 540000, "USD", "NA"),
+                new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
+                new Trade("T1003", "David", 120000, "USD", "NA"),
+                new Trade("T1004", "Peter", 4000, "USD", "NA"),
+                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
+                new Trade("T1006", "Mark", 25000, "CAD", "NA"),
+                new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
+                new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
+                new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
+        );
+
+        Map<String, List<Trade>> collect = trades.stream()
+                .collect(Collectors.groupingBy(Trade::getRegion));
+
+        System.out.println(collect.toString());
+    }
+
+    @Test
+    public void advanced_grouping_test() {
+        List<Trade> trades = Arrays.asList(
+                new Trade("T1001", "John", 540000, "USD", "NA"),
+                new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
+                new Trade("T1003", "David", 120000, "USD", "NA"),
+                new Trade("T1004", "Peter", 4000, "USD", "NA"),
+                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
+                new Trade("T1006", "Mark", 25000, "CAD", "NA"),
+                new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
+                new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
+                new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
+        );
+
+        Map<String, Map<String, List<Trade>>> collect = trades.stream()
+                .collect(Collectors.groupingBy(Trade::getRegion
+                        , Collectors.groupingBy(Trade::getCurrency)));
+
+        System.out.println(collect);
+    }
+
+
+    @Test
+    public void advanced_grouping_choose_result_test() {
+        List<Trade> trades = Arrays.asList(
+                new Trade("T1001", "John", 540000, "USD", "NA"),
+                new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
+                new Trade("T1003", "David", 120000, "USD", "NA"),
+                new Trade("T1004", "Peter", 4000, "USD", "NA"),
+                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
+                new Trade("T1006", "Mark", 25000, "CAD", "NA"),
+                new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
+                new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
+                new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
+        );
+
+        Map<String, Map<String, List<Trade>>> collect = trades.stream()
+                .collect(Collectors.groupingBy(Trade::getRegion
+                        , ConcurrentHashMap::new // 추가
+                        , Collectors.groupingBy(Trade::getCurrency)));
+
+        /**
+         * groupingBy는 스레드 세이프하지 않으므로
+         * groupingByConcurrency 메소드를 쓰면 내부적으로 ConcurrentHashMap을 사용하기 때문에 스레드 세이프함.
+         */
+    }
 
 
 

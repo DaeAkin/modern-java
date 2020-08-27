@@ -42,10 +42,10 @@ public class ToXMLCollector implements Collector<Employee, StringBuffer, String>
         String xmlstr = emps.parallelStream().collect(new ToXMLCollector());
         System.out.println(xmlstr);
 
-        Collector.<Employee, StringBuffer, String>of(StringBuffer::new,
-                (sb, e) -> sb.append(String.format(xmlstr, e.empid, e.name, e.technology)),
-                (sb1, sb2) -> sb1.append(sb2.toString()),
-                sb -> sb.insert(0, "<employees>").append("\n</employees>").toString(),
-                Collections.emptySet());
+//        Collector.<Employee, StringBuffer, String>of(StringBuffer::new,
+//                (sb, e) -> sb.append(String.format(xmlstr, e.empid, e.name, e.technology)),
+//                (sb1, sb2) -> sb1.append(sb2.toString()),
+//                sb -> sb.insert(0, "<employees>").append("\n</employees>").toString(),
+//                Collections.emptySet());
     }
 }
