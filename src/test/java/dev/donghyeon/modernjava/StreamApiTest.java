@@ -12,8 +12,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StreamApiTest {
@@ -95,11 +95,11 @@ public class StreamApiTest {
         // Sorting words based on word lengths
         Function<String, Integer> keyExtractor = str -> str.length();
         Stream.of("grapes", "milk", "pineapple", "water-melon")
-                .sorted(Comparator.comparing(keyExtractor))
+                .sorted(comparing(keyExtractor))
                 .forEach(System.out::println);
 
         Stream.of("grapes", "milk", "pineapple", "water-melon")
-                .sorted(Comparator.comparing(String::length, Comparator.reverseOrder()))
+                .sorted(comparing(String::length, Comparator.reverseOrder()))
                 .forEach(System.out::println);
     }
 
@@ -234,6 +234,113 @@ public class StreamApiTest {
          */
     }
 
+    @Test
+    public void true_false_partitioning_test() {
+        List<Trade> trades = Arrays.asList(
+                new Trade("T1001", "John", 540000, "USD", "NA"),
+                new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
+                new Trade("T1003", "David", 120000, "USD", "NA"),
+                new Trade("T1004", "Peter", 4000, "USD", "NA"),
+                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
+                new Trade("T1006", "Mark", 25000, "CAD", "NA"),
+                new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
+                new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
+                new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
+        );
+
+        Map<Boolean, List<Trade>> map2 = trades.stream()
+                .collect(Collectors.partitioningBy(t -> "USD".equals(t.getCurrency())));
+        System.out.println(map2);
+
+        //{false=[T1002, T1005, T1006, T1007, T1008, T1009], true=[T1001, T1003, T1004]}
+    }
+
+    @Test
+    public void simple_summarizingDouble_test() {
+        List<Trade> trades = Arrays.asList(
+                new Trade("T1001", "John", 540000, "USD", "NA"),
+                new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
+                new Trade("T1003", "David", 120000, "USD", "NA"),
+                new Trade("T1004", "Peter", 4000, "USD", "NA"),
+                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
+                new Trade("T1006", "Mark", 25000, "CAD", "NA"),
+                new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
+                new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
+                new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
+        );
+
+        Map<String, DoubleSummaryStatistics> map = trades.stream()
+                .collect(Collectors.groupingBy(Trade::getRegion,
+                        Collectors.summarizingDouble(Trade::getNotional)));
+
+        DoubleSummaryStatistics naData = map.get("NA");
+        System.out.printf("No of deals: %d\nLargest deal: %f\nAverage deal cost: %f\nTotal traded amt: %f",
+                naData.getCount(), naData.getMax(), naData.getAverage(), naData.getSum());
+
+    }
+
+    @Test
+    public void simple_collectingAndThen_test() {
+        List<Trade> trades = Arrays.asList(
+                new Trade("T1001", "John", 540000, "USD", "NA"),
+                new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
+                new Trade("T1003", "David", 120000, "USD", "NA"),
+                new Trade("T1004", "Peter", 4000, "USD", "NA"),
+                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
+                new Trade("T1006", "Mark", 25000, "CAD", "NA"),
+                new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
+                new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
+                new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
+        );
+        // set -> unmodifableSet 으로 변환
+        Set<Trade> set = trades.stream().collect(collectingAndThen(toSet(), Collections::unmodifiableSet));
+    }
+
+    @Test
+    public void collectingAndThen의_좋은예제_test() {
+        List<Trade> trades = Arrays.asList(
+                new Trade("T1001", "John", 540000, "USD", "NA"),
+                new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
+                new Trade("T1003", "David", 120000, "USD", "NA"),
+                new Trade("T1004", "Peter", 4000, "USD", "NA"),
+                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
+                new Trade("T1006", "Mark", 25000, "CAD", "NA"),
+                new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
+                new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
+                new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
+        );
+
+        Map<String, Optional<Trade>> map1 = trades.stream()   // Solution-1
+                .collect(groupingBy(Trade::getRegion, maxBy(comparing(Trade::getNotional))));
+
+
+        Map<String, Trade> map2 = trades.stream()             // Solution-2
+                .collect(groupingBy(Trade::getRegion,
+                        collectingAndThen(maxBy(comparing(Trade::getNotional)), Optional::get)));
+        //maxBy가 Optional을 리턴하기 때문에, collectingAndThen으로 Optional.get()을 호출해서 풀어주는 모습.
+    }
+    /*
+        collectionAndThen : A -> B
+        mapping : A <- B
+     */
+    @Test
+    public void mapping_test() {
+        List<Trade> trades = Arrays.asList(
+                new Trade("T1001", "John", 540000, "USD", "NA"),
+                new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
+                new Trade("T1003", "David", 120000, "USD", "NA"),
+                new Trade("T1004", "Peter", 4000, "USD", "NA"),
+                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
+                new Trade("T1006", "Mark", 25000, "CAD", "NA"),
+                new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
+                new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
+                new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
+        );
+
+        Map<String, Set<String>> map = trades.stream()
+                .collect(groupingBy(Trade::getRegion, mapping(Trade::getTradeId, toSet())));
+        System.out.println(map);
+    }
 
 
 
