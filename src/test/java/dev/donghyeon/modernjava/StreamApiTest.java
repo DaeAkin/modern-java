@@ -336,6 +336,7 @@ public class StreamApiTest {
                 new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
                 new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
         );
+        
 
         Map<String, Set<String>> map = trades.stream()
                 .collect(groupingBy(Trade::getRegion, mapping(Trade::getTradeId, toSet())));
