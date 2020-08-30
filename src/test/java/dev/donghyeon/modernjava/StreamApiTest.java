@@ -330,13 +330,12 @@ public class StreamApiTest {
                 new Trade("T1002", "Mark", 10000, "SGD", "APAC"),
                 new Trade("T1003", "David", 120000, "USD", "NA"),
                 new Trade("T1004", "Peter", 4000, "USD", "NA"),
-                new Trade("T1005", "Mark", 300000, "SGD", "APAC"),
                 new Trade("T1006", "Mark", 25000, "CAD", "NA"),
                 new Trade("T1007", "Lizza", 285000, "EUR", "EMEA"),
                 new Trade("T1008", "Maria", 89000, "JPY", "EMEA"),
                 new Trade("T1009", "Sanit", 1000000, "INR", "APAC")
         );
-        
+
 
         Map<String, Set<String>> map = trades.stream()
                 .collect(groupingBy(Trade::getRegion, mapping(Trade::getTradeId, toSet())));
