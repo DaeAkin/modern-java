@@ -337,7 +337,7 @@ public class StreamApiTest {
         );
 
 
-        Map<String, Set<String>> map = trades.stream()
+        Map<String, Set<String>> map = trades .stream()
                 .collect(groupingBy(Trade::getRegion, mapping(Trade::getTradeId, toSet())));
         System.out.println(map);
     }

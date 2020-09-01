@@ -137,5 +137,44 @@ public class DateTimeApiTest {
         OffsetDateTime : A date-time with an offset from UTC/Greenwich in the ISO-8601 calendar system, such as 2007-12-03T10:15:30+01:00.
         OffsetTime : A time with an offset from UTC/Greenwich in the ISO-8601 calendar system, such as 10:15:30+01:00.
         ZoneRulesProvider : Provides time zone rules.
+
+        It is not recommended to use ZoneOffset as they don’t contain daylight saving details if a country or city supporting it.
+        (ZoneOffset은 국가 나 도시에서 지원하는 경우 일광 절약 세부 정보가 포함되어 있지 않으므로 사용하지 않는 것이 좋습니다.)
      */
+
+    @Test
+    public void zonedDateTime_test() {
+        ZoneId zone = ZoneId.of("Asia/Kolkata");
+
+        LocalDateTime dateTime = LocalDateTime.parse("2014-12-03T10:15:30");
+        ZonedDateTime z11 = dateTime.atZone(zone);
+        ZonedDateTime z12 = ZonedDateTime.of(dateTime, zone);
+        System.out.println(z11.toString());
+
+        LocalDate date = LocalDate.of(2014, 3, 18);
+        ZonedDateTime z21 = date.atStartOfDay(zone);
+        ZonedDateTime z22 = ZonedDateTime.of(date, LocalTime.now(), zone);
+
+        Instant instant = Instant.now();
+        ZonedDateTime z31 = instant.atZone(zone);
+        ZonedDateTime z32 = ZonedDateTime.ofInstant(instant, zone);
+    }
+
+    @Test
+    public void offsetDateTime_test() {
+        /*
+            As we saw time zones are also represented by an offset value from UTC,
+            OffsetDateTime represents an object with date/time information and an offset,
+            for example, 2014-12-03T11:30-06:00. Instant, OffsetDateTime and ZonedDateTime are very much looks similar
+            but there are key differences exists. Instant represents a point in time in UTC on a continuous time line,
+            OffsetDateTime maintains time zone with an offset compared to UTC and ZonedDateTime contains time zone information along with Day-Light-saving rules.
+            It is always better to use ZonedDateTime or Instant for simple usages. As like other temporal instances, this also has standard method patterns to create its instances.
+         */
+        ZoneOffset offset = ZoneOffset.of("-2");
+
+        OffsetDateTime.now(offset);
+        OffsetDateTime.of(LocalDateTime.now(), offset);
+        OffsetDateTime.of(LocalDate.now(), LocalTime.now(), offset);
+        OffsetDateTime.ofInstant(Instant.now(), offset);
+    }
 }
