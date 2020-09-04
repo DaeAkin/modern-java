@@ -28,7 +28,7 @@ public interface Spliterator<T> {
 
   `forEachRemaning` 메소드를 보면 순차적으로 spliterator 요소를 처리하기 위해 do ~ while 문을 사용하여 tryAdvance 메소드를 반복적으로 호출을 합니다. While splitting task when a spliterator finds itself to be small enough that can be executed sequentially then it calls forEachRemaining method on its elements.
   
-- **trySplit** 는 요소를 분할하여 두번 째 spliterator에게 병렬적으로 처리를 요청하기 위해 사용됩니다. 이런 아이디어는 자료 구조의 밸런스된 병렬 처리를 위함 입니다.  마지막의 분할 처리가 null을 반환 할 때 까지 spliterator는 반복적으로 trySplit 메소드를 호출합니다. 
+- **trySplit** 는 요소를 분할하여 두번 째 spliterator에게 병렬적으로 처리를 요청하기 위해 사용됩니다. 이런 아이디어는 자료 구조의 밸런스된 병렬 처리를 위함 입니다.  마지막의 분할 처리가 null을 반환 할 때 까지 spliterator는 반복적으로 trySplit 메소드를 호출합니다.  (parallel = true 일때만 동작하는 함수)
 
 - **estimateSize** 는 spliterator에서 사용 가능한 요소의 수를 알려 줍니다. 이 메소드는 대부분 *AbstractTask* 같은 forkjoin에서 trySplit을 호출하기전에 사이즈를 체크하는 용도로 사용합니다.
 
@@ -36,7 +36,11 @@ public interface Spliterator<T> {
 
 
 
+## Oracle 공식 문서
 
+Spliterator는 각각으로 요소를 순회하 거나(tryAdvance()), 순차적(forEachRemaining())으로 순회할 수 있습니다. 
+
+trySplite()를 이용하여 병행 연산을 위해 또다른 Spliterator로 나눌 수 있습니다. Spliterator를 이용할 때 요소를 분할할 수 없거나, 분할 했는데 밸런스맞게 분할되지 않았거나, 비효율적인 방법을 사용했다면, 병행처리의 이점을 얻을 수 없습니다.
 
 
 
