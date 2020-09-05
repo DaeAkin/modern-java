@@ -42,7 +42,13 @@ Spliterator는 각각으로 요소를 순회하 거나(tryAdvance()), 순차적(
 
 trySplite()를 이용하여 병행 연산을 위해 또다른 Spliterator로 나눌 수 있습니다. Spliterator를 이용할 때 요소를 분할할 수 없거나, 분할 했는데 밸런스맞게 분할되지 않았거나, 비효율적인 방법을 사용했다면, 병행처리의 이점을 얻을 수 없습니다.
 
+IMMUTABLE이나 CONCURRENT를 사용하지 않는 Spliterator는 다음과 같은 정책이 적용 됩니다. 
 
+
+
+
+
+## Late-Binding?
 
 
 
